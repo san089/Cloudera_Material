@@ -1,0 +1,67 @@
+How to access hive metastore. 
+
+Hive metastore uses an RDBMS database to store metadata, which can a mysql database or derby. To check which database it is check the hive-site.xml file. The data will be something like: 
+
+<property>
+    <name>javax.jdo.option.ConnectionURL</name>
+    <value>jdbc:mysql://127.0.0.1/metastore?createDatabaseIfNotExist=true</value>
+    <description>JDBC connect string for a JDBC metastore</description>
+  </property>
+
+
+This says that the hive metastore is using mysql RDBMS for metastore. To connect to and check the data in hive metastore the default credentials of mysql is
+username: hive
+password: cloudera
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Useful queries for hive_metastore. 
+
+Show all Hive databases
+
+    SELECT * FROM hive.DBS;
+
+List tables in a given database
+
+    SELECT t.* FROM hive.TBLS t
+     JOIN hive.DBS d
+     ON t.DB_ID = d.DB_ID
+     WHERE d.NAME = 'default';
+
+Show the storage location of a given table
+
+    SELECT s.* FROM hive.TBLS t
+    JOIN hive.DBS d
+    ON t.DB_ID = d.DB_ID
+    JOIN hive.SDS s
+    ON t.SD_ID = s.SD_ID
+    WHERE TBL_NAME = 'sample_07'
+    AND d.NAME='default';
+
+
+Find out how a given view has been defined
+
+    SELECT t.* FROM hive.TBLS t
+    JOIN hive.DBS d
+    ON t.DB_ID = d.DB_ID
+    WHERE TBL_NAME = 'vw_sample_07'
+    AND d.NAME='default';
+
+Get column names, types and comments of a given table
+
+    SELECT c.* FROM hive.TBLS t
+     JOIN hive.DBS d
+     ON t.DB_ID = d.DB_ID
+     JOIN hive.SDS s
+     ON t.SD_ID = s.SD_ID
+     JOIN hive.COLUMNS_V2 c
+     ON s.CD_ID = c.CD_ID
+     WHERE TBL_NAME = 'sample_07'
+     AND d.NAME='default'
+     ORDER by INTEGER_IDX;
+
+Link: https://analyticsanvil.wordpress.com/2016/08/21/useful-queries-for-the-hive-metastore/
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+

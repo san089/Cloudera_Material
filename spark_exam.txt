@@ -1,0 +1,52 @@
+Reading avro file in spark
+There is no way to read avro file using sparkContext, we have to use sqlContext to read avro file.
+val = sqlContext.read.format("com.databricks.spark.avro").load("/user/cloudera/customers/")
+
+Reading parquet file in spark
+val = sqlContext.read.format("parquet").load("/user/cloudera/customer_parquet/").rdd
+
+Reading sequenceFile 
+
+What is seqence File?
+SequenceFile is a flat file consisting of binary key/value pairs. It is extensively used in MapReduce as input/output formats. It is also worth noting that, internally, the temporary outputs of maps are stored using SequenceFile. 
+
+There are 3 different SequenceFile formats:
+Uncompressed key/value records.
+Record compressed key/value records - only 'values' are compressed here.
+Block compressed key/value records - both keys and values are collected in 'blocks' separately and compressed. The size of the 'block' is configurable. 
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Adding a new column in RDD. 
+It's not straight forward to add new column to RDD. One method to do is:
+val.map(lambda val : (val , val['customer_fname'] + ' ' +val['customer_lname'] )).take(5)
+This will also work but it will return a tuple with row object and the other is Full Name 
+
+
+Another method is to convert rdd to dataframe and then add the column then convert back to rdd.
+from pyspark.sql.functions import lit
+from pyspark.sql.functions import col
+
+#Convert RDD to DataFrame
+val = val.toDF()
+
+#Add new column
+val = val.withColumn('full_name', concat(col('customer_fname'),lit(' '),col('customer_lname')) )
+
+#If I do like below I will not get the desired concatenated string because with '+' it expects the integer values which is not in this case so null will be there in the full_name
+#val = val.withColumn('full_name', col('customer_fname') + lit('D ') + col('customer_lname') )
+
+#Then convert back to rdd 
+val = val.rdd
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Confusion betweeen sqlContext, SparkContext, SparkSession
+
+In older version of Spark there was different contexts that was entrypoints to the different api (sparkcontext for the core api, sql context for the spark-sql api, streaming context for the Dstream api etc...) this was source of confusion for the developer and was a point of optimization for the spark team, so in the most recent version of spark there is only one entrypoint (the spark session) and from this you can get the various other entrypoint (the spark context , the streaming context , etc ....)
+
+
+Can I create SparkSession from previous SparkContext? 
+Apparently there is no way how to initialize SparkSession from existing SparkContext.
+
+
