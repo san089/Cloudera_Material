@@ -1,0 +1,16 @@
+--num-executors NUM
+--driver-cores  NUM
+--executor-cores NUM
+
+--driver-memory MEM 
+--executor-memory MEM
+
+
+spark-shell --master yarn 
+		--num-executors 4 
+		--executor-memory 2g 
+		--name sampleapp
+
+
+-- scala code to read all properties of the spark config
+sc.getConf.getAll foreach println

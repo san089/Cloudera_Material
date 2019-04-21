@@ -1,0 +1,32 @@
+1. Total sales for each date
+2. Total sales for each month
+3. Average sales for each date
+4. Average sales for each month
+5. Total orders by order status 
+6. Total orders by order status for each date/month
+7. Repeated customers for each month 
+8. Total orders for each customers for each day/month
+9. Top 3 purchased customers for each day/month
+10. Most sold products for each day/month
+
+---------------------------------------------------------
+
+Q : Calculate sum of COMPLETED orders for each day and find average sales for each day
+		Alternative approach using aggregateByKey
+
+Q: Filter data into a smaller dataset using Spark
+
+Q : Sorting orders status by its total no. in descending 
+
+Q : Sorting orders status by its total sales in descending 
+
+Q : Max priced product from each category
+
+Q : All products having max priced from each category
+
+Q : Max purchased customers from each month
+
+Q : Max sold product from each month
+
+Q : Get 3rd top most purchased customers from each month
+

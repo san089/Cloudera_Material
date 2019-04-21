@@ -1,0 +1,51 @@
+Import Orders table from mysql into hdfs in avro format.
+Load this avro files into hive as orders table.
+
+----------------------------------------------------------
+
+text formatted 
+
+Q : Creating MANAGED table Orders in Hive (Text format)
+
+Q : Creating MANAGED table Orders in Hive (Sequence format)
+
+Q : Creating MANAGED table Orders in Hive (Avro format)
+
+Q : Creating MANAGED table Orders in Hive (Parquet format)
+
+
+-------------------------Working with avro files -------------------------------
+# Extract an Avro schema from a set of datafiles using avro-tools
+# avro-tools comes with various options. To extract schema from an avro file, 
+# use avro-tools getschema <avro file>
+
+avro-tools getschema Orders.avro
+
+# using avro-tools, we can convert avro data into JSON 
+
+avro-tools tojson Orders.avro
+
+# to extract metadata, 
+# getmeta & getschema almost return similar output
+
+avro-tools getmeta Orders.avro
+
+--------------------------------------------------------------------------------
+
+# Create a table in the Hive metastore using the Avro file format and an external schema file
+# To get table data in avro format, we can use sqoop import to transform RDBMS data into AVRO
+# sqoop import command export mysql table data in avro format
+# it will emit 2 outputs. 1) avsc file 2) actual avro data files
+# avsc file will be stored in your local working folder
+# avro data files will be stored in HDFS (default: /user/<your login folder>/, in this case it is /user/cloudera)
+# if you want to override the target folder, specify explicitely using switch --warehouse-dir or --target-dir
+# difference between --target-dir and --warehouse-dir is: 
+# in case of --target-dir, all files will be copied into the specified directory
+# in case of --warehouse-dir, all files will be copied under folder with name of table created, in the specified directory
+
+# Please note: you cannot use --hive-import switch when the target is avro format
+
+---------------------------------------------------------------------------------------------
+
+Q : Load data into hive with partitioned columns.
+

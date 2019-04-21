@@ -1,0 +1,162 @@
+Verify if the folder exist in HDFS or not.
+Delete the target directories if exist.
+#Import all tables from MySQL database retail_db into HDFS location /user/cloudera/
+#Import all tables from MySQL database retail_db into HDFS location /user/cloudera/ in avro file format.
+
+-------------------------------------
+
+Import all tables in hive.
+ 
+Create a hive db retail_db. Check the db folder location.
+Empty the target db folder so that new tables can be migrated.
+
+#Import all tables from MySQL database retail_db into Hive default database
+#We cannot use --hive-import and --as-avrodatafile or --as-sequencefile together
+#Hive import doesn't compatible with Avro or Sequence format
+
+
+#Import all tables from MySQL database retail_db into Hive database retail_db
+#When you are using --create-hive-table switch, you have to make sure, the tables which you're going to import doesn't exists in retail_db database
+#If yes, you need to drop them and delete any hdfs folder with table exists, delete them as well
+
+#Import all tables from MySQL database retail_db into Hive database retail_db
+#Removed --create-hive-table switch
+
+----------------------------------------
+
+Importing single table to hive.
+
+#Import data from MySQL table orders into HDFS location /user/cloudera/orders
+#As Textfile format
+#Default field delimiter is comma
+
+#Import data from MySQL table orders into HDFS location /user/cloudera/orders
+#Let sqoop delete target dir if exists
+
+#Import data from MySQL table orders into HDFS location /user/cloudera/orders
+#Overriding the fields delimiter to $
+
+#Verification Script (using hadoop fs command)
+hadoop fs -cat /user/cloudera/orders/part* | wc -l
+
+Import table orders to hdfs where order status is complete. 
+
+#Sqoop Import using Serial way
+#This will have impact in performance. Serial import means number of mappers is 1. And the import will be done serially. 
+It is recommended to keep lesser map tasks than your cluster map slots if that values increases than the map slots, tasks start execution in serial way which results in degraded performance.
+
+#Free form import
+#$CONDITIONS must be passed in the where clause and also split-by field must be specified
+
+#Free form import with user-defined conditions
+
+#Built-in validator
+#Validator works with single table only... and cannot use where criteria
+
+#Import mysql table data into HDFS using Sequence File format
+
+#Import mysql table data into HDFS using Avro File format
+#This will create sqoop_import_<<Table>>.avsc file under current directory where sqoop command is executed
+
+Import the avro files imported in the last step into hive.
+
+Import orders from ordertable where order number between 100 and 200 using the boundary values.
+
+
+-----------------------------------------------
+
+Single table imports to hive 
+
+
+#Import data from MySQL table into Hive (default HDFS Location /user/hive/warehouse)
+#For importing data into Hive, we need to explicitely specify the field delimiter
+#When we do import into Hive, the data will be first copied under default hdfs folder and then to hive
+#Hence it is must to delete the hdfs folder 
+#For ex: if you're importing orders table into hive, data will first copied to hdfs folder /user/cloudera/orders
+#If your source table is not having any primary key defined, 
+#you need to explicitely define the column which contains unique key using --split-by switch
+#We cannot use --hive-import and --as-avrodatafile or --as-sequencefile together
+#Hive import doesn't compatible with Avro or Sequence format
+
+Q : Import orders table into hive. 
+
+Q : You can use --delete-target-dir option to let sqoop delete the target hdfs folder
+
+Q : create a dummy database in hive and import orders tables into that db. Take only orders greater than 100.
+
+--------------------------------------------------
+
+Sqoop export to MYSQL table.
+
+Q : select first 4 columns from the hive orders table and export to mysql.
+
+Q : Import mysql orders tables into hive with $ as delimiter. export this table first 4 columns to mysql.
+
+Q : Export the sequencefile stored in hdfs to mysql
+
+Q : Export the avro file stored in hdfs to mysql
+
+#Exporting sequence file into MySQL
+#For SequenceFile, we need to explicitely specify 
+#--jar-file & --class-name switch to let Sqoop know how to handle the data
+#To get the jarfile, you need to either develope your own program or 
+#keep the jarfile generated while you do sqoop import 
+
+
+---------------------------------------------------
+
+Ingestion questions 
+
+Q : Import data from a MySQL database into HDFS using Sqoop
+# Importing orders table data from retail_db into HDFS 
+#	- textfile format with default delimiter, default mapper
+#	- even if we dont specify target-dir, the output will be written to default hdfs folder
+
+Q : Importing orders table data from retail_db into HDFS 
+#	- textfile format with default delimiter, default mapper
+#	- Clean up target dir if it exists
+
+Q : Importing orders table data from retail_db into HDFS 
+#	- textfile format with only one mapper (so, total files will be 1)
+#	- Clean up target dir if it exists
+
+Q : Importing orders table data from retail_db into HDFS 
+#	- textfile format with only one mapper (so, total files will be 1)
+#	- Conditional Import 
+
+Q : Importing orders table data from retail_db into HDFS with append
+#	- textfile format with only one mapper (so, total files will be 1)
+#	- Conditional Import 
+
+Q : Importing orders table data from retail_db into HDFS 
+#	- textfile format with only one mapper (so, total files will be 1)
+#	- Clean up target dir if it exists
+#	- Only specific columns (order_id, order_date, order_status)
+#	- When we use --columns switch, there shouldn't be any white-space char between columns
+
+Q : Importing orders table data from retail_db into HDFS
+#	- textfile format with freeform query 
+#	- when using freeform query, we must specify target-dir
+#	- and also, we must specify split-by switch to specify column provided if we dont pass --m 1
+
+Q : Importing orders table data from retail_db into HDFS
+#	- sequencefile
+#	- when using freeform query, we must specify target-dir
+#	- and also, we must specify split-by switch to specify column provided if we dont pass --m 1
+
+Q : Importing orders table data from retail_db into HDFS
+#	- avrodatafile (This option will create .avsc file (AVRO Schema file) in the local working folder
+#	- when using freeform query, we must specify target-dir
+#	- and also, we must specify split-by switch to specify column provided if we dont pass --m 1
+
+Q : Export data to a MySQL database from HDFS using Sqoop
+#1	- Exporting orders data from HDFS to MySQL table orders_export_test
+
+Ingest real-time and near-real time (NRT) streaming data into HDFS using Flume
+#1	- Ingest real-time data into HDFS 
+#	- Below is the flume conf file to read the data realtime
+#	- It will read the result of "tail" command and ingest into HDFS 
+#	- Save this below conf into flume-exec-test.conf file under your local folder 
+
+
+Github : https://github.com/write2sivakumar/cca175

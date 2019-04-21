@@ -1,0 +1,5 @@
+--create a database 
+create database cca175db;
+
+Q : Create a table called customer_part containing all records and fields of customer_mgd but partitioned by state.
+
