@@ -1,0 +1,44 @@
+Getting the namenode ip.
+
+cd /etc/hadoop/conf
+view core-site.xml
+check for fs.defaultFS
+
+to check block size and replication
+view hdfs-site.xml
+
+
+
+Copy from local to hdfs 
+
+Either use 
+hdfs dfs -copyFromLocal <source> <destination>
+or 
+hdfs dfs -put <source> <destination>
+
+
+
+Get the size of a directory in hdfs 
+
+hdfs dfs -du -s -h /user/cloudera/orders
+
+
+
+Get detail of files and file blocks on hdfs.
+
+hdfs fsck /user/cloudera/orders/ -files -blocks -locations
+
+
+
+
+
+
+******************************************  YARN  ************************************************
+
+check the yarn-site.xml file for details
+
+cd /etc/hadoop/conf
+view yarn-site.xml
+
+search for resource manager. 
+
