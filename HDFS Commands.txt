@@ -40,5 +40,6 @@ check the yarn-site.xml file for details
 cd /etc/hadoop/conf
 view yarn-site.xml
 
-search for resource manager. 
+search for resource manager. - yarn.resoucemanager.webapp.address
+
 

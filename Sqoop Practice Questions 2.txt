@@ -1,3 +1,9 @@
+Import a table from mysql where there is not primary key in the table.
+Split-by on a textual column.
+user of --auto-reset-mapper
+
+
+
 Import all customer record from the customers table in retail_db mysql database into HDFS path "/user/cloudera/output/retail_db/customers_text".
 Fields should be tab delimited and all records must be imported into a single text file
 
