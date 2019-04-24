@@ -1,0 +1,160 @@
+---------Sqoop : Check connection to database by listing databases----------------------------
+
+sqoop list-databases --connect jdbc:mysql://quickstart.cloudera:3306 --username root --password cloudera
+
+---------Sqoop : Check the tables in the retail_db database------------------------------------
+
+sqoop list-tables --connect jdbc:mysql://quickstart.cloudera:3306/retail_db --username root --password cloudera
+
+---------Sqoop : Check number of records in orders table in retail_db using sqoop -------------
+
+sqoop eval --connect jdbc:mysql://quickstart.cloudera:3306/retail_db --username root --password cloudera --query "select count(*) from orders"
+
+
+
+----------------------------------Import------------------------------------------------------
+
+
+Q : Import orders table from mysql to HDFS with all default parameters.
+
+
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/retail_db --username root --password cloudera --table orders 
+
+The job ran with 4 mappers. It should have created 4 files in the destination folder. Let's check
+
+hdfs dfs -ls /user/cloudera/orders/part* | wc -l
+
+Let's check if the number of lines in file is equal to number of records in the table.
+
+hdfs dfs -cat /user/cloudera/orders/part* | wc -l
+
+
+----------------------------------------------------------------------------------------------------
+
+Q: Importing orders table data from retail_db into HDFS textfile format with only one mapper (so, total files will be 1). (Make sure to clean up the HDFS directory before running job)
+
+Deleting the directory before running the job : hdfs dfs -rm -r  /user/cloudera/orders
+
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/retail_db --username root --password cloudera --table orders --m 1 
+
+Let's check if one file is created in target directory.
+
+hdfs dfs -ls /user/cloudera/orders/part* | wc -l
+
+Verifying the number of records in the file.
+
+hdfs dfs -cat /user/cloudera/orders/part* | wc -l
+
+----------------------------------------------------------------------------------------------------
+
+
+Q : Import orders table from the retail_db. Only import first 30000 orders and save the output in directory /home/cloudera/orders.
+
+
+Clean up the target directory - hdfs dfs -rm -r /user/cloudera/orders
+
+#Cannot use --table and --query both at same time. Also when using free form query we have to specify the splitby condition as well.
+
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/retail_db --username root --password cloudera  --query "select * from orders where order_id < 30001 and \$CONDITIONS" --target-dir /user/cloudera/orders --split-by order_id
+
+Another method of doing the same
+
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/retail_db --username root --password cloudera  --table orders --where "order_id < 30001" --target-dir /user/cloudera/orders --split-by order_id --delete-target-dir
+
+Output Check - Number of records moved to hdfs
+
+hdfs dfs -cat /user/cloudera/orders/part* | wc -l
+
+----------------------------------------------------------------------------------------------------
+
+Q : Load the rest of the records from the orders table into hdfs. ( Use sqoop append mode )
+
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/retail_db --username root --password cloudera --table orders --where "order_id > 30000" --append --target-dir '/user/cloudera/orders'
+
+
+Check the total records in hdfs and in mysql db.
+
+hdfs dfs -cat /user/cloudera/orders/part*  | wc -l
+
+mysql -uroot -pcloudera -e "select count(*) from retail_db.orders"
+
+
+----------------------------------------------------------------------------------------------------
+
+Q : Import orders table into hdfs, only selected columns (order_id, order_date, order_status)
+
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/retail_db --username root --password cloudera --columns 'order_id,order_date,order_status' --table orders --delete-target-dir
+
+
+----------------------------------------------------------------------------------------------------
+
+Q : Import table orders from retail_db with columns (order_id, order_date, order_status) with first 30000 records only into parquet files.
+
+
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/retail_db --username root --password cloudera --table orders --columns 'order_id, order_date, order_status' --where 'order_id < 30001' --delete-target-dir --as-parquetfile --target-dir /user/cloudera/orders
+
+----------------------------------------------------------------------------------------------------
+
+Q : Import orders tables from retail_db in snappy compression format and the file format as parquet.
+
+
+
+
+
+----------------------------------------------------------------------------------------------------
+
+Q : Import orders_items table (Columns : order_item_id, order_item_order_id, order_item_product_price ) from mysql to hive directly using the sqoop import.
+
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/retail_db --username root --password cloudera --table order_items --columns 'order_item_id, order_item_order_id, order_item_product_price' --split-by order_item_id --hive-import --hive-database retail_db_import --hive-table order_items
+
+
+----------------------------------------------------------------------------------------------------
+
+Hive Import arguments - ( --hive-overwrite & --create-hive-table )
+
+--hive-overwrite  = will fail if the tables already exists.(In sqoop documentation its incorrect)
+ERROR tool.ImportTool: Import failed: org.apache.hadoop.mapred.FileAlreadyExistsException: Output directory hdfs://quickstart.cloudera:8020/user/cloudera/order_items already exists
+
+--create-hive-table = will fail the job if the table already exists in the database
+Failed Message : FAILED: Execution Error, return code 1 from org.apache.hadoop.hive.ql.exec.DDLTask. AlreadyExistsException(message:Table order_items already exists)
+
+----------------------------------------------------------------------------------------------------
+
+Q : Import orders table from retail_db. Only import orders greater than 1,00,000 using the boundary value condition operator.
+
+
+
+----------------------------------------------------------------------------------------------------
+
+Q : Import orders table from retail_db. Only import completed orders. Import data in parquet file format with snappy compression.
+
+
+
+
+----------------------------------------------------------------------------------------------------
+
+Q : Import data from table and handle null values.
+
+
+
+----------------------------------------------------------------------------------------------------
+
+
+Q : Load the table orders_item into the hive database retail_db_import using sqoop import.
+
+Simple hive import from mysql.
+
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/retail_db --username root --password cloudera --table order_items --hive-import --hive-table order_items
+
+If you run the same import command again, it will generate another copy of the data in the same directory.
+
+----------------------------------------------------------------------------------------------------
+
+Q : Sqoop import all tables. 
+We cannot use --split-by with import all tables. 
+While importing all tables the default number of mappers is set to 4. There might exist some table which don't have the primary key, so in that case with 4 mappers the job will fail to import those tables. In such case it's better to use the argument --autoreset-to-one-mapper. It will set the mapper to 1 and the tables without primary key can be imported successfully.
+
+----------------------------------------------------------------------------------------------------
+
+
+
