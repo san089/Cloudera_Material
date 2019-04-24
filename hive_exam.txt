@@ -1,3 +1,24 @@
+-----------------------------------------------------------------------------------------------------
+Setting configuration properties in hive shell. 
+
+When in hive type : set hive.  and press TAB key. It will show all the configuration variables that can be set in hive.
+
+For Example to show the current db in the hive CLI. 
+
+set hive.cli.print.current.db = true;
+
+-----------------------------------------------------------------------------------------------------
+To check where the hive stores the files on hdfs. Run below command in hive shell.
+
+set hive.metastore.warehouse.dir;
+
+It will give the hdfs path of the file.
+Then use : hdfs dfs -ls /user/hive/warehouse
+There will be folder names with the database names.
+
+Or check : /etc/hive/conf
+
+-----------------------------------------------------------------------------------------------------
 How to access hive metastore. 
 
 Hive metastore uses an RDBMS database to store metadata, which can a mysql database or derby. To check which database it is check the hive-site.xml file. The data will be something like: 
