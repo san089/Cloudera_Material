@@ -1,3 +1,28 @@
+------------------------------------------------------------------------------------------------
+Entry Point 
+
+First reading the File into RDD & read into DataFrame & read through Temp table.
+
+order_items = sc.textFile("retail_db/order_items/*")
+
+order_items_clean = order_items.map(lambda val : val.split(","))
+
+
+#Creating a DataFrame from RDD
+
+from pyspark.sql import Row
+
+order_items_df = order_items_clean.map( lambda val : Row( order_item_id = int(val[0]) , order_item_order_id = int(val[1]), order_item_product_id = int(val[2]), order_item_quantity = int(val[3]), order_item_subtotal = float(val[4]), order_item_product_price = float(val[5]) )    ).toDF()
+
+#Creating Temporary table from the dataframe.
+sqlContext.sql("select * from order_items")
+#Then we can run sql queries on it like 
+sqlContext.sql("select * from order_items limit 10").show()
+
+
+------------------------------------------------------------------------------------------------
+
+
 Reading avro file in spark
 There is no way to read avro file using sparkContext, we have to use sqlContext to read avro file.
 val = sqlContext.read.format("com.databricks.spark.avro").load("/user/cloudera/customers/")
