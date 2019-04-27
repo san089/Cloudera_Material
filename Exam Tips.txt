@@ -1,0 +1,12 @@
+3 main tips - Lessons learnt from first attempt failure :
+Tip 1 : Use sqoop eval to check mysql table details (dont try mysql directly. it may not work . it did not work for me during my first attempt. This time I just relied on sqoop eval. it is smooth and easy)
+Tip 2 ; Don’t ever delete target directory in hdfs … if you have to delete for valid reason be very careful and don’t delete the input source directory by mistake (that’s what I did during my first attempt)
+Tip 3 : If you are stuck on something… move on to next problem and try to nail easy ones 100pct. You can revisit the unfinished problem later on if you have time. But don’t just struggle with one problem for a long time.
+
+
+Commands to remember :
+spark-shell --master yarn --packages com.databricks:spark-avro_2.10:2.0.1 --> this is very very very important. just memorize this. If you do not then you might get the questions incorrect.
+hive --> you need this to get the hdfs path of the table by using "describe formatted " . but you wont perform any processing on this. you mostly use spark-shell for most of your problems
+sqoop eval/import/export
+hadoop fs -ls -R xxxxxxx
+
