@@ -103,11 +103,25 @@ categories_rdd = categories_rdd.map(lambda val : (val.category_id , val.category
 
 --------------Solving using dataframe--------------
 
+order_product.withColumn('order_item_subtotal' , order_product.order_item_subtotal.cast(DoubleType())).show(5)
+
+order_product_group = order_product.groupBy('order_item_product_id','product_name').sum('order_item_subtotal')
+
+order_product_group = order_product_group.withColumnRenamed( "sum(order_item_subtotal)" , 'product_subtotal')
+
+order_product_group = order_product_group.withColumn("product_subtotal" , col("product_subtotal").cast(FloatType()))
+
+order_product_group.orderBy("product_subtotal" , ascending = [0])
+
 
 
 --------------Solving using sparksql--------------
 
+order_item_df.registerTempTable("order_items")
 
+product_df.registerTempTable("products")
+
+sqlContext.sql("show tables").show()
 
 
 
