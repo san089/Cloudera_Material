@@ -1,0 +1,43 @@
+orderDF = spark.read.csv('path').toDF('order_id' , 'order_date' , 'order_customer_id', 'order_status')
+
+orderDF.printSchema()
+
+orderDF.select('order_id', 'order_date')
+
+orderDF.describe().show()
+
+orderDF.createTempTable('orders')
+spark.sql("select * from orders").show()
+
+sc = spark.SparkContext()
+
+Read data from textFile use - spark.read.csv()    or spark.read.text()
+
+#Changing the column datatype
+orders = orderCSV.withColumn('order_id',ordersCSV.order_id.cast(IntegerType()))
+
+
+#Reading data from hive tables.
+orders = spark.read.table('db_name.table_name')
+
+#Another approach to read data from hive
+orders = spark.sql('select * from db_name.table_name')
+
+#Reading data from relational database - like mysql
+First we need to specify the jdbc jar file for mysql. It should be done while launching the spark-shell like this:
+pyspark --master yarn --conf spark.ui.port=12888 --jars '<location of jar file>' --driver-class-path '<location of jar file>'
+
+orders = spark.read.format('jdbc').option('url', 'jdbc:mysql://quickstart.cloudera:3306').option('dbtable' , 'retail_db.orders').option('username','root').option('password','cloudera').load()
+
+or other way:
+
+orders = spark.read.jdbc('jdbc:mysql://quickstart.cloudera:3306', 'retail_db.orders' , numPartitions = 4, properties = {'user' : 'root', 'password' : 'cloudera'} )
+
+
+Try various options of jdbc and it has replaced sqoop to read and move data into hadoop.
+
+
+Try pyspark functions like - concat, substring, lower, upper, trim, date_format, trunc, typecasting, case when
+
+
+try selectExpr()
