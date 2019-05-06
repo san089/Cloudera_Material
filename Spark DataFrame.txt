@@ -41,3 +41,11 @@ Try pyspark functions like - concat, substring, lower, upper, trim, date_format,
 
 
 try selectExpr()
+
+
+----------------------------------------------------------
+Filter data in DataFrame 
+
+orders.filter(orders.order_status.isin('CLOSED','COMPLETE') )
+orders = orders.filter( (orders.order_status ==  'CLOSED') | (orders.order_status == 'COMPLETE') )
+
