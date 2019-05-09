@@ -1,0 +1,81 @@
+02.Find_sales_for_each_month.txt
+
+#To find sales for each month, we need to join orders & order_items dataset
+#order_items dataset has sales for each order, orders dataset having order_date
+#To find month, we can use substring to get year & month
+
+orders = spark.read.format('com.databricks.spark.avro').load('/user/sanchit089/retail_db/orders/*.avro')
+
+#Converting date format from unix to utc.
+orders = orders.withColumn('order_date_converted' , from_unixtime(orders.order_date/1000.0))
+
+order_items = spark.read.parquet('/user/sanchit089/retail_db/order_items/*.parquet')
+
+#Joining two dataframes
+orders_join = orders.join(order_items, orders.order_id == order_items.order_item_order_id).select('order_id','order_status','order_date_converted','order_item_subtotal')
+
+sales = orders_join.groupBy(year(orders_join.order_date_converted).alias('year'), month(orders_join.order_date_converted).alias('month')).agg({"order_item_subtotal" : "sum"})
+
+#rounding the sales value and renaming the column.
+sales = sales.withColumnRenamed("sum(order_item_subtotal)",'total_sales')
+sales = sales.withColumn('total_sales', round(sales.total_sales,2))
+
+#To check the compression codec for parquet in spark
+spark.conf.get('spark.sql.parquet.compression.codec')
+#setting the compression to none
+sales.write.parquet('/user/sanchit089/output/sales', compression = 'snappy')
+
+
+------------------------03.Find_avg_sales_for_each_date.txt--------------------------------------------
+
+orders = spark.read.format('com.databricks.spark.avro').load('/user/sanchit089/retail_db/orders/*.avro')
+
+#Converting date format from unix to utc.
+orders = orders.withColumn('order_date_converted' , from_unixtime(orders.order_date/1000.0))
+
+order_items = spark.read.parquet('/user/sanchit089/retail_db/order_items/*.parquet')
+
+#Joining two dataframes
+orders_join = orders.join(order_items, orders.order_id == order_items.order_item_order_id).select('order_id','order_status','order_date_converted','order_item_subtotal')
+
+
+orderavg = orderjoin.groupBy(to_date(orderjoin.order_date_converted).alias('date')).agg(avg(orderjoin.order_item_subtotal).alias('average'))
+
+orderavg = orderavg.select(orderavg.date, round(orderavg.average,2).alias('average'))
+
+#Saving the file as avro with gzip compression
+Failed(the file will be saved to the loacation but wont be compressed) because avro does not support gzip compression. 
+Below is the list of compression supported by avro
+
+/** Maps a codec name into a CodecFactory.
+   *
+   * Currently there are five codecs registered by default:
+   * <ul>
+   *   <li>{@code null}</li>
+   *   <li>{@code deflate}</li>
+   *   <li>{@code snappy}</li>
+   *   <li>{@code bzip2}</li>
+   *   <li>{@code xz}</li>
+   * </ul>
+   */
+
+
+sqlContext.setConf("spark.sql.avro.compression.codec","snappy")
+orderavg.write.format('com.databricks.spark.avro').save('/user/sanchit089/output/avg_sales/')
+
+Validating Result
+
+sqoop eval --connect jdbc:mysql://nn01.itversity.com:3306/retail_db --username retail_dba --password itversity --query "select o.order_date, round(avg(order_item_subtotal),2) from orders o inner join order_items oi on o.order_id = oi.order_item_order_id group by o.order_date order by o.order_date"
+
+-----------------------------04.Find_avg_sales_for_each_month.txt---------------------------------
+
+
+orders_join = orders.join(order_items, orders.order_id == order_items.order_item_order_id).select('order_id','order_status','order_date_converted','order_item_subtotal')
+
+result = orders_join.groupBy(date_format(orders_join.order_date_converted,'MM-yyyy').alias("year_month") ).agg(round(avg(orders_join.order_item_subtotal),2).alias('average'))
+
+result = result.orderBy(result.year_month, ascending = [1])
+
+
+
+--------------------------------------------------------------------------------------------------------
