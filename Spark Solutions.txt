@@ -30,3 +30,12 @@ sales.write.parquet('/user/sanchit089/output/sales', compression = 'snappy')
 productfilter.groupBy('product_category_id').agg({'product_price':'max', 'product_id':'count', 'product_price':'mean', 'product_price':'min'}).show(5)
 
 productfilter.groupBy('product_category_id').agg(max(productfilter.product_price).alias('max'), min(productfilter.product_price).alias('min'), count(productfilter.product_category_id).alias('count'), avg(productfilter.product_price).alias('mean')).show()
+
+
+sqoop import --connect jdbc:mysql://nn01.itversity.com:3306/retail_import --username retail_dba --password itversity --table sanchit_products --fields-terminated-by '*' --lines-terminated-by '\n' --null-non-string -1000 --null-string 'NA' --where 'product id <= 1111' -m 2 --delete-target-dir --target-dir '/user/sanchit089/problem5/products-text-part1' --boundary-query "select min(product_id), max(product_id) from sanchit_products $CONDITION where product_id <= 1111"
+
+
+
+ sqoop export --connect jdbc:mysql://nn01.itversity.com:3306/retail_export --username retail_dba --password itversity --
+
+ 
